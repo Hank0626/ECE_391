@@ -1,0 +1,243 @@
+<=========================================================>
+<=================>    BUG LOG HEADER   <=================>
+<=========================================================>
+Assignment:
+    MP2
+CreateTime:
+    2022.02.24
+
+Check Point 1:
+<--------------------------------------------------------->
+                          BUG 1                          
+<--------------------------------------------------------->
+File:
+    modex.c
+Time:
+    2022.02.24.
+Creator:
+    Peiyuan Liu
+Description:
+    When I finished draw_vertical_line function, I tested it
+    on the mazegame. However, it seems that it is the same as
+    the unmodified mazegame. My implementation of the function
+    draw_vertical_line is wrong. 
+Solution:
+    It seems that I just copied the addr++ in the function
+    draw_horizontal_line. It is not the case for the vertical.
+    I changed the addr++ to addr += SCROLL_X_WIDTH. Ant it 
+    works.
+
+<--------------------------------------------------------->
+                          BUG 2                          
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.02.26.
+Creator:
+    Peiyuan Liu
+Description:
+    Last time I finished showing the status bar. I set the 
+    color of status bar 0x55, and the text of the status
+    bar to 0x00. The palette dispaly 0x55 as grey and 
+    0x00 as black. But when I run it again in the next day,
+    all the status bar turn into black! I didn't change
+    any code. 
+Solution:
+    I used the mysterious color (0x55) which is not seted
+    by the color palette. I changed 0x55 to 0x1, and
+    it works. (Now the status bar works).
+
+<--------------------------------------------------------->
+                          BUG 3                          
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.02.27.
+Creator:
+    Peiyuan Liu
+Description:
+    When the fruit is right against the wall and the player stop
+    on the fruit, the fruit will not disappear immediately.
+Solution:
+    At first, if the player didn't move, I will not redraw the 
+    screen. Now I changed to always redraw the screen.
+
+<--------------------------------------------------------->
+                          BUG 4                          
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.03.02.
+Creator:
+    Peiyuan Liu
+Description:
+    When I want to add the function of the fruit text, the above 
+    area of player is always black. Besides, when the player is
+    moving, the black area will follow the player to move.
+Solution:
+    I implement another function to redraw the background of the
+    fruit text like the "draw_mask_block". I put this function 
+    after the function "show_screen". And then it works properly.
+
+Check Point 2:
+<--------------------------------------------------------->
+                          BUG 5                          
+<--------------------------------------------------------->
+File:
+    tuxctl_ioctl.c
+Time:
+    2022.03.02.
+Creator:
+    Peiyuan Liu
+Description:
+    The time displayed on the tux board is wrong. Specifically,
+    it displayed "7.00" instead of "0.00" at the beginning of 
+    each level and it remains the same as time elapsed. Then, 
+    when the time on the status bar reaches 1 minute, the tux
+    displayed "7.01". Therefore, there must be something wrong
+    of my tuxctl_ioctl_tux_set_led functions.
+Solution:
+    I found that I made mistake of two of the array index. It
+    should be "i - 2", instead of "i".
+
+<--------------------------------------------------------->
+                          BUG 6                          
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.03.05.
+Creator:
+    Peiyuan Liu
+Description:
+    When I want to quit my mazegame, I press the button '`'.
+    It should be quit normally and print the text "Quitter".
+    But my mazegame only stucked. It seems that the tux 
+    thread did not end properly.
+Solution:
+    I change the pthread_join(tid3, NULL) to pthread_cancel(tid3).
+    It is because the tux thread is not control by the keyboard,
+    so it should not used join. Instead, just cancel it when
+    the other two thread is end.
+
+<--------------------------------------------------------->
+                          BUG 7                          
+<--------------------------------------------------------->
+File:
+    tuxctl_ioctl.c
+Time:
+    2022.03.05.
+Creator:
+    Peiyuan Liu
+Description:
+    When I want to display A to F (letter) on the tux
+    led, my program crash with segmentation fault. Then
+    I figured out that I didn't store the text information
+    in the array (I only store 0 - 9)
+Solution:
+    I extend the information array from 10 to 16, add
+    the information of A to F
+    
+<--------------------------------------------------------->
+                          BUG 8                          
+<--------------------------------------------------------->
+File:
+    modex.c
+Time:
+    2022.03.05.
+Creator:
+    Peiyuan Liu
+Description:
+    Last time I finished implementing the dispaly of fruit
+    text, it worked properly at that time. But today the 
+    color of the fruit text becomes black. The color changed
+    mysteriously! The same as the BUG 1. Oh god. Then I 
+    figure out I just add the transparent index but I did not
+    extend the color palette. So the color maybe determine by
+    the system.
+Solution:
+    I add new 64 transparent color palette. The color is calcualted
+    as the interpolation of balck and the original color.
+    And it finally works.
+
+
+<--------------------------------------------------------->
+                          BUG 9                         
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.03.08.
+Creator:
+    Peiyuan Liu
+Description:
+    I see on the piazza that the text string is given. So I
+    copied the text string to my program instead of the original
+    text string I created. When I made and runned the mazegame 
+    again, I got "segmentation fault" when I read a peach.
+Solution:
+    Originally, I set the maximum length of fruit text is 13. 
+    However, the text of the peach now is much longer.
+    The length of "eh, it's a peach" is 17. So I change the
+    defined maximum length from 13 to 17. And it works.
+
+<--------------------------------------------------------->
+                          BUG 10                         
+<--------------------------------------------------------->
+File:
+    tuxctl_ioctl.c
+Time:
+    2022.03.08.
+Creator:
+    Peiyuan Liu
+Description:
+    When I press the reset button on the tux emulator, I 
+    found that the time display on the tux displayed and 
+    cannot be restored back to the tux. It seems that I
+    didn't implement the restored array.
+Solution:
+    I store the led array after put it to the tux and 
+    the tux display properly now.
+
+<--------------------------------------------------------->
+                          BUG 11                         
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.03.08.
+Creator:
+    Peiyuan Liu
+Description:
+    My mazegame worked properly for the first several minutes
+    (seven or eight minutes). However, after this time slot,
+    the status bar of my game and the center of the player
+    turned into black and stayed in black. It seems here is 
+    some problem of my random color.
+Solution:
+    I used to use the total time to determine the color. The
+    total time (times) will increase in the whole game. As it
+    went on, the times may be overflow. I create another 
+    variable "time1", which is able to refresh when the player
+    eat a fruit.
+
+<--------------------------------------------------------->
+                          BUG 12                         
+<--------------------------------------------------------->
+File:
+    mazegame.c
+Time:
+    2022.03.08.
+Creator:
+    Peiyuan Liu
+Description:
+    The led displayed on my tux will display 4 digits whatever
+    the time is. However, it should only display three digits
+    when the time is less than 10 minutes.
+Solution:
+    I did not determine the condition of the minute in the
+    maze game. I added an if condition to adjust the situation
+    smaller than 10 minutes.
