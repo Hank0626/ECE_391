@@ -1,0 +1,360 @@
+<=========================================================>
+<=================>    BUG LOG HEADER   <=================>
+<=========================================================>
+Assignment:
+    MP3
+CreateTime:
+    2022.03.15
+
+Check Point 1:
+<--------------------------------------------------------->
+                          BUG 1                          
+<--------------------------------------------------------->
+File: boot.S
+
+Time: 2022.03.15
+
+Creator: Peiyuan Liu
+
+Description: The machine is not booted properly. When I tried
+             to boot the machine, it just reboot and stuck in
+             a loop.
+
+Solution: After I called the idt_initial function, the order of
+          popl is wrong. So I change the order of popl.
+
+<--------------------------------------------------------->
+                          BUG 2                          
+<--------------------------------------------------------->
+File: idt.c
+
+Time: 2022.03.16
+
+Creator: Peiyuan Liu
+
+Description: When doing the idt_test() function, it seems that
+             the idt is not loaded properly. The test failed.
+             The problem is the pointer of each entry of the
+             exception is NULL.
+
+Solution: I set the reserved4-reserved0 bits and presented 
+          bit properly, the problem solved.
+
+<--------------------------------------------------------->
+                          BUG 3                          
+<--------------------------------------------------------->
+File: idt.c
+
+Time: 2022.03.19
+
+Creator: Peiyuan Liu
+
+Description: After I finished keyboard.c, I tried to test it 
+             on the machine. For every single key, it worked
+             properly. However, if I switched to press the 
+             different key swiftly, the machine will crash.
+
+Solution: I used to implement the keyboard interrupt in c
+          language, but the c doesn't have "iret". So I 
+          reimplemented in assembly language.
+
+<--------------------------------------------------------->
+                          BUG 4                          
+<--------------------------------------------------------->
+File: idt_.S
+
+Time: 2022.03.20
+
+Creator: Ziyuan Lin
+
+Description: When implementing the idt_.S, I forgot to
+             add "$" in front of the numeber, thus all
+             the number is considered as memory reference
+             instead of its value.
+
+Solution: I add the "$" in front of the number.
+
+<--------------------------------------------------------->
+                          BUG 5                          
+<--------------------------------------------------------->
+File: idt_.S
+
+Time: 2022.03.20
+
+Creator: Ziyuan Lin
+
+Description: The machine still rebooted automatically, while
+             it worked properly of the original implementation.\
+             It must be something wrong in idt_.S
+
+Solution: In the previous line of every "iret", I forgot to 
+          clear the stack. So I adjusted the esp properly.
+
+<--------------------------------------------------------->
+                          BUG 6                          
+<--------------------------------------------------------->
+File: i8259.c
+
+Time: 2022.03.21
+
+Creator: Peiyuan Liu
+
+Description: When we were testing the rtc interrupt, we found
+             that the rtc interrupt would only generate once.
+             So the whole scrren will not flash.
+
+Solution: The send_eoi function of the PIC is not correct. For
+          the slave PIC, the interrupt number should minus 8.
+          
+To do:
+    1. page.h comment
+    2. exception while loop
+
+-----------------------------------------------------------
+Checkpoint 2
+
+<--------------------------------------------------------->
+                          BUG 1                          
+<--------------------------------------------------------->
+File: rtc.c
+
+Time: 2022.03.26
+
+Creator: Kunle Li
+
+Description: 2 Hz moves more slowly than 1024 Hz
+
+Solution: When right shifting to determine the power, we should 
+          use 1 instead of 0. Otherwise, 1 will be regarded as 
+          an legal input.
+
+<--------------------------------------------------------->
+                          BUG 2                          
+<--------------------------------------------------------->
+File: rtc.c
+
+Time: 2022.03.26
+
+Creator: Kunle Li
+
+Description: Did not write the auto linefeed function, which 
+             made the characters go out of the screen.
+
+Solution: Give a new linefeed when the number of characters we 
+          input exceeds 80.
+
+<--------------------------------------------------------->
+                          BUG 3                          
+<--------------------------------------------------------->
+File: syscall.S, syscall.c
+
+Time: 2022.03.27
+
+Creator: Ziyuan Lin
+
+Description: Declare two pointer type variable as label, but
+             store more than one data inside it. Causing
+             overlap.
+
+Solution: Change the variable to be array.
+
+<--------------------------------------------------------->
+                          BUG 4                          
+<--------------------------------------------------------->
+File: syscall.S, syscall.c
+
+Time: 2022.03.27
+
+Creator: Ziyuan Lin
+
+Description: Store the function pointer inside the label will
+             not be the value.
+
+Solution: Change the pt to be a pointer to pointer. Dereference
+          twice to a certain function.
+
+<--------------------------------------------------------->
+                          BUG 5                          
+<--------------------------------------------------------->
+File: filesys.c
+
+Time: 2022.03.26
+
+Creator: Ziyuan Lin
+
+Description: Use strcpy rather than strncpy. The maximal length
+             is not controled. If filename is over 32 characters,
+             the \0 in the buffer will be gone.
+
+Solution: Use strncpy.
+
+<--------------------------------------------------------->
+                          BUG 6                          
+<--------------------------------------------------------->
+File: filesys.c
+
+Time: 2022.03.26
+
+Creator: Ziyuan Lin
+
+Description: When comparing the filename and the required name,
+             for the very long file name not ended with \0 in
+             32 bytes, the maximal length lead to fail.
+
+Solution: Check whether the name of the file is longer than 32,
+          set the maximal length to be 32.
+
+<--------------------------------------------------------->
+                          BUG 7                          
+<--------------------------------------------------------->
+File: keyboard.c
+
+Time: 2022.03.26
+
+Creator: Peiyuan Liu
+
+Description: When I try to press any key to launch the RTC test,
+             the RTC did't work. But it worked properly when 
+             directly launching the RTC test.
+
+Solution: I first send_eoi of keyboard interrupt, then call the 
+          RTC test in the launch_test.
+
+<--------------------------------------------------------->
+                          BUG 8                          
+<--------------------------------------------------------->
+File: lib.c
+
+Time: 2022.03.27
+
+Creator: Peiyuan Liu
+
+Description: When pressing the backspace, the cursor didn't move
+             left by 1 as intended. It moved left by 1 and moved
+             up by 1.
+
+Solution: Add the situation when screen_x = 0 and screen_y > 0, the
+          cursor will move up by 1 and screen_x = NUM_COL - 1. 
+          Otherwise if x > 0, the cursor will only move left by 1.
+          i.e. screen_x -= 1
+
+
+<--------------------------------------------------------->
+                          BUG 9                          
+<--------------------------------------------------------->
+File: terminal.c, keyboard.c
+
+Time: 2022.03.27
+
+Creator: Peiyuan Liu
+
+Description: The line buffer will hold more than 128 characters,
+             and the backspace can just delete the echo character.
+             The element in the line buffer was not deleted when
+             backspace was pressed.
+
+Solution: Add the threshold of the line buffer array and decrement
+          the buffer index by 1 when backspace is pressed.
+
+Checkpoint 3
+<--------------------------------------------------------->
+                          BUG 1                          
+<--------------------------------------------------------->
+File: syscall.c
+
+Time: 2022.4.9
+
+Creator: Lin Ziyuan
+
+Description: In sys_execute function, I forgot the little edian and I
+add a 0 padding in the wrong order. Then the iret cannot work properly
+because my ss and cs is strange.
+
+Solution: First pushw $0 and then pushw the segment register onto the
+stack.
+
+<--------------------------------------------------------->
+                          BUG 2                          
+<--------------------------------------------------------->
+File: syscall.c
+
+Time: 2022.4.9
+
+Creator: Lin Ziyuan
+
+Description: After sys_execute function, I find that I can enter the shell
+executable. However, I cannot process correctly. Then I add the breakpoint
+inside the user program. I found that I cannot enter the system linkage. This
+happens because I missed a 0 for the base address of the kernel stack. Then I
+set up the stack on a unmapped page. General protection error.
+
+Solution: Add the 0 before 8.
+
+<--------------------------------------------------------->
+                          BUG 3                          
+<--------------------------------------------------------->
+File: idt.c
+
+Creator: Lin Ziyuan
+
+Description: I added the system call entry in the IDT. However, I did not change
+the DPL to 3. This causes the user program not able to call system call.
+
+Solution: Change dpl of system call idt entry to 3.
+
+<--------------------------------------------------------->
+                          BUG 4                      
+<--------------------------------------------------------->
+File: syscall.c
+
+Creator: Liu Peiyuan
+
+Description: Declare a very large variable inside the kernel stack and cause the info
+structure broken. Thus cause the file operation cannot work properly.
+
+Solution: Do not declare the variable but use the long global variable instead, even
+though the code looks a little bit complecated.
+
+<--------------------------------------------------------->
+                          BUG 5                      
+<--------------------------------------------------------->
+File: syscall.c
+
+Creator: Lin Ziyuan
+
+Description: In sys_execute, I tried to add the ebp into the PCB structure. However,
+we use a function call to implement the task. Thus the real ebp is the *ebp inside the
+function. Thus we cannot return to the correct point in system call linkage.
+
+Solution: movl (%ebp), variable instead of movl %ebp, variable.
+
+<--------------------------------------------------------->
+                          BUG 6                      
+<--------------------------------------------------------->
+File: syscall.c
+
+Creator: Liu Peiyuan
+
+Description: In sys_halt, first change the counter, than change the ebp value. This is
+bad because we actually want the ebp of the current PCB.
+
+Solution: Declare a varibale and assign it the value of the ebp of the current PCB.
+
+
+Checkpoint 4
+<--------------------------------------------------------->
+                          BUG 1                          
+<--------------------------------------------------------->
+File: terminal.c
+
+Time: 2022.4.16
+
+Creator: Liu Peiyuan
+
+Description: When I was testing the "cat" system call, it worked
+for cat created.txt, but failed for any other file. It must be
+something wrong with the sys_getargs or sys_write (terminal write).
+
+Solution: I found that the terminal_write limit the output size into 
+128  (the same as the input buffer), which is wrong. So I increased the 
+output size and it worked for all other files.
