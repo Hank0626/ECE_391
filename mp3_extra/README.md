@@ -3,7 +3,7 @@
 # LLL OS
 This repository contains all files of the final MP of ECE 391 taken in Spring 2022 at UIUC. We implemented our own operating system, and functions it supports are as follows.
 
-## Required Functions
+## Core Features
 1. System calls;
 2. Virtual memory (paging);
 3. Read-only file system;
