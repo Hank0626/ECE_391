@@ -13,6 +13,9 @@ This repository contains the machine problem (mp) assignments for the ***ECE391 
 ## MP3: Operating System Kernel
 MP3 involves writing an operating system kernel for Linux. The [mp3_master](./mp3_master/) directory contains the basic requirements for the operating system kernel, while the [mp3_extra](./mp3_extra/) directory includes additional features such as boot animation, GUI module, and dynamic allocation module. Our operating system is named LLL OS.
 
+Here is the demo of our [LLL OS](./mp3_extra/):
+![image](./assets/demo.gif)
+
 ## Contributor
 * Liu Peiyuan
 * Lin Ziyuan
